@@ -65,6 +65,8 @@
 </html>
 
 <script>
+  /* Lighting */
+  /* ------------------------------------------------------------------------------------------------------------------------ */
   var light = document.querySelector( '#light');
   var ground = document.querySelector('#ground');
   var up = document.querySelector('#up');
@@ -126,6 +128,28 @@
     light.setAttribute("intensity", 0.6);
   }
 
+  /* Reset */
+  /* ------------------------------------------------------------------------------------------------------------------------ */
+  var scene = document.querySelector('a-scene');
+  var longPress = false;
+  var timeout = 3000;
 
+  scene.addEventListener('touchstart', (e) => {
+    longPress = true;
+    setTimeout(() => {
+        if (longPress) {
+          reset();
+    }}, timeout);
+  })
+
+  scene.addEventListener('touchend', () => {
+    longPress = false;
+  })
+
+  function reset() {
+    lighting = "default"
+    light.setAttribute("intensity", 1);
+  }
+  /* ------------------------------------------------------------------------------------------------------------------------ */
   
 </script>
