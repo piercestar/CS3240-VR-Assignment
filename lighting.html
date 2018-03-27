@@ -16,7 +16,6 @@
 
     
     <a-scene id="scene-light" light="defaultLightsEnabled: false">
-      <a-entity>
     <!-- <a-assets>
       stage change options
       <a-entity class="link"
@@ -46,11 +45,12 @@
       <!-- audience -->
       <a-curvedimage src="assets/audience.jpg" height="30" radius="80" theta-length="72"
                   rotation="0 53.228 0" position="-42.05 12.053 0" scale="0.8 0.8 0.8"></a-curvedimage>
-      <!-- Light links. -->
+      
+      <!-- invisible sky plane (for detecting upward gaze) -->
       <a-plane rotation="90 0 0" width="300" height="500" position="0 20 0"
-               material="opacity: 0.0; transparent: true" id="up"></a-plane>
+      material="opacity: 0.0; transparent: true" id="up"></a-plane>
 
-      </a-entity>
+      <!-- Light links. -->
       <a-light type="directional" color="#FFF" intensity="0.6" position="-0.5 1 1"></a-entity>
       <a-light type="ambient" color="#BBB" id="light"></a-light>
 
@@ -58,7 +58,6 @@
       <a-camera position="5.192 7.687 1.544" rotation="1.948 88.865 -1.776" id="camera">
         <a-cursor color="yellow" fuse="true", fuse-timeout="3000"/>
       </a-camera>
-    </a-entity>
     </a-scene>
 
     
