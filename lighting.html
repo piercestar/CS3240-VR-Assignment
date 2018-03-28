@@ -15,7 +15,7 @@
   <body>
 
     
-    <a-scene>
+    <a-scene id="scene-light" light="defaultLightsEnabled: false">
     <!-- <a-assets>
       stage change options
       <a-entity class="link"
@@ -45,38 +45,111 @@
       <!-- audience -->
       <a-curvedimage src="assets/audience.jpg" height="30" radius="80" theta-length="72"
                   rotation="0 53.228 0" position="-42.05 12.053 0" scale="0.8 0.8 0.8"></a-curvedimage>
+      
+      <!-- invisible sky plane (for detecting upward gaze) -->
+      <a-plane rotation="90 0 0" width="300" height="500" position="0 20 0"
+      material="opacity: 0.0; transparent: true" id="up"></a-plane>
+
       <!-- Light links. -->
-      <a-entity id="lightSphere" geometry="primitive: sphere; radius: 2" material="shader: flat" light="type: point; color: #E4E486" position="-0.157 21.934 0.821"
-                ></a-entity>
-      <a-light type="ambient" color="#FFF" intensity="1" id="light"></a-light>
+      <a-light type="directional" color="#FFF" intensity="0.6" position="-0.5 1 1"></a-entity>
+      <a-light type="ambient" color="#BBB" id="light"></a-light>
 
       <!-- Camera + cursor. -->
-      <a-camera position="5.192 7.687 1.544" rotation="1.948 88.865 -1.776">
-        <a-cursor color="yellow"/>
+      <a-camera position="5.192 7.687 1.544" rotation="1.948 88.865 -1.776" id="camera">
+        <a-cursor color="yellow" fuse="true", fuse-timeout="3000"/>
       </a-camera>
     </a-scene>
 
-
+    
   </body>
 </html>
 
 <script>
+  /* Lighting */
+  /* ------------------------------------------------------------------------------------------------------------------------ */
   var light = document.querySelector( '#light');
   var ground = document.querySelector('#ground');
-
-  ground.addEventListener('mouseenter', () => {
-                       var lightVal = light.getAttribute("intensity");
-
-                       setTimeout( (shouldDim) => {
-                            light.setAttribute("intensity", 0.1);
-                       }, 2000);
-                     });
+  var up = document.querySelector('#up');
+  var current_pos = camera.getAttribute('rotation');
+  
+  var lighting = 'default';
+  var interval;
+  var offset = 10;
+  var delay = 1500;
 
   ground.addEventListener('mouseleave', () => {
-                       var lightVal = light.getAttribute("intensity");
+    clearInterval(interval);
+    });
 
-                       setTimeout( (shouldDim) => {
-                            light.setAttribute("intensity", 1);
-                       }, 2000);
-                     });
+  up.addEventListener('mouseleave', () => {
+    clearInterval(interval);
+  })
+
+  ground.addEventListener('mouseenter', () => {
+
+        interval = setInterval(() => {
+          if (checkForHold() && lighting != "dim") {
+            dim();
+          }
+          }, delay);
+  })
+
+  up.addEventListener('mouseenter', () => {
+      
+      interval = setInterval(() => {
+        if (checkForHold() && lighting != "bright") {
+          brighten();
+        }}, delay);
+  })
+
+  function checkForHold() {
+    var pos_before = current_pos;
+    var pos_after = camera.getAttribute('rotation');
+
+    if (pos_before.x >= pos_after.x - offset && pos_before.x <= pos_after.x + offset &&
+        pos_before.y >= pos_after.y - offset && pos_before.y <= pos_after.y + offset &&
+        pos_before.z >= pos_after.z - offset && pos_before.z <= pos_after.z + offset) {
+
+      current_pos = pos_after;
+      return true;
+    } else {
+      current_pos = pos_after;
+      return false;
+    }
+  }
+
+  function brighten() {
+    lighting = "bright"
+    light.setAttribute("intensity", 1.4);
+  }
+
+  function dim() {
+    lighting = "dim"
+    light.setAttribute("intensity", 0.6);
+  }
+
+  /* Reset */
+  /* ------------------------------------------------------------------------------------------------------------------------ */
+  var scene = document.querySelector('a-scene');
+  var longPress = false;
+  var timeout = 3000;
+
+  scene.addEventListener('touchstart', (e) => {
+    longPress = true;
+    setTimeout(() => {
+        if (longPress) {
+          reset();
+    }}, timeout);
+  })
+
+  scene.addEventListener('touchend', () => {
+    longPress = false;
+  })
+
+  function reset() {
+    lighting = "default"
+    light.setAttribute("intensity", 1);
+  }
+  /* ------------------------------------------------------------------------------------------------------------------------ */
+  
 </script>
