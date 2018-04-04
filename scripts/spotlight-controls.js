@@ -1,10 +1,10 @@
-AFRAME.registerComponent('generate-spotlights', {
+AFRAME.registerComponent('spotlight-controls', {
     init: function() {
         this.startPoint = null;
         this.endPoint = null;
         this.lines = [];
         this.drawingTimer;
-        this.drawingTimeOut = 4000;
+        this.drawingTimeOut = 3000;
         this.zFightingOffset = 0.01;
 
         this.bindMethods();
@@ -77,7 +77,7 @@ AFRAME.registerComponent('generate-spotlights', {
             this.endPoint.x + ' ' + 
             -this.endPoint.z + ' ' + 
             (this.startPoint.y + this.zFightingOffset);
-        var lineColor = 'grey';
+        var lineColor = 'white';
         var lineWidth = '5';
 
         var line = document.createElement('a-entity');
@@ -100,13 +100,13 @@ AFRAME.registerComponent('generate-spotlights', {
     },
 
     onDrawingTimeOut: function() {
-        this.removePointers();
+        this.resetFloor();
         this.positionSpotlights(this.getSpotlightPositions());
-        this.cleanUp();
+        this.resetLineData();
     },
 
-    removePointers: function() {
-        // Clear pointer objects
+    resetFloor: function() {
+        // Clear pointer and spotlight objects
         while(this.el.firstChild) {
             this.el.removeChild(this.el.firstChild);
         }
@@ -159,9 +159,20 @@ AFRAME.registerComponent('generate-spotlights', {
         }); 
     },
 
-    cleanUp: function() {
+    resetLineData: function() {
         this.startPoint = null;
         this.endPoint = null;
         this.lines = [];
+    },
+
+    reset: function() {
+        this.resetFloor();
+        this.resetLineData();
+    },
+
+    setOpacity: function(opacity) {
+        this.el.childNodes.forEach(function(node) {
+            node.setAttribute('opacity', 0.2 * opacity);
+        });
     }
 });
