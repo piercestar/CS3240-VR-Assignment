@@ -1,4 +1,4 @@
-function reset() {
+function enableReset() {
     var scene = document.querySelector('a-scene');
     var longPress = false;
     var timeout = 3000;

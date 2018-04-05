@@ -67,19 +67,28 @@ AFRAME.registerComponent('lighting-controls', {
     },
 
     setIntervalToDim: function() {
+        // console.log(this.currentPosition);
         if (this.checkForHold() && this.lighting != 'dim') {
             this.dim();
         }
+        // console.log(this.currentPosition);
     },
 
     checkForHold: function() {
-        var positionBefore = this.currentPosition;
-        var positionAfter = camera.getAttribute('rotation');
-    
-        this.currentPosition = positionAfter;
-        return positionBefore.x >= positionAfter.x - this.offset && positionBefore.x <= positionAfter.x + this.offset &&
-            positionBefore.y >= positionAfter.y - this.offset && positionBefore.y <= positionAfter.y + this.offset &&
-            positionBefore.z >= positionAfter.z - this.offset && positionBefore.z <= positionAfter.z + this.offset;
+        var previousPosition = this.currentPosition;
+        // For some reason objects are not being assigned correctly
+        // i.e this.currentPosition = camera.getAttribute('rotation');
+        // will result in currentPosition not being updated correctly
+        // between interval calls.
+        this.currentPosition = {
+           x: camera.getAttribute('rotation').x,
+           y: camera.getAttribute('rotation').y,
+           z: camera.getAttribute('rotation').z
+        };
+
+        return previousPosition.x >= this.currentPosition.x - this.offset && previousPosition.x <= this.currentPosition.x + this.offset &&
+            previousPosition.y >= this.currentPosition.y - this.offset && previousPosition.y <= this.currentPosition.y + this.offset &&
+            previousPosition.z >= this.currentPosition.z - this.offset && previousPosition.z <= this.currentPosition.z + this.offset;
     },
 
     brighten: function() {
