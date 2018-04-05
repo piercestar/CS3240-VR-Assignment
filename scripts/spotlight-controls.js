@@ -6,6 +6,8 @@ AFRAME.registerComponent('spotlight-controls', {
         this.drawingTimer;
         this.drawingTimeOut = 3000;
         this.zFightingOffset = 0.01;
+        this.lastClicked = 0;
+        this.lastClickedOffset = 500;
 
         this.bindMethods();
         this.addEventListeners();
@@ -21,20 +23,27 @@ AFRAME.registerComponent('spotlight-controls', {
     },
 
     onClick: function(event) {
-        var point = event.detail.intersection.point;
-        this.addPointer(point);
-        
-        if (this.startPoint) {
-            this.endPoint = point;
-            this.drawLine();
-            this.storeLine();
-            this.drawingTimer = setTimeout(
-                this.onDrawingTimeOut,
-                this.drawingTimeOut
-            );
-        } else {
-            this.startPoint = point;
-            clearTimeout(this.drawingTimer);
+        // Workaround for issue with clicks triggering twice in 
+        // A-FRAME mobile > 0.7.0:
+        // https://github.com/aframevr/aframe/issues/3297
+        var now = Date.now();
+        if (now - this.lastClicked > this.lastClickedOffset) {
+            this.lastClicked = now;
+            var point = event.detail.intersection.point;
+            this.addPointer(point);
+            
+            if (this.startPoint) {
+                this.endPoint = point;
+                this.drawLine();
+                this.storeLine();
+                this.drawingTimer = setTimeout(
+                    this.onDrawingTimeOut,
+                    this.drawingTimeOut
+                );
+            } else {
+                this.startPoint = point;
+                clearTimeout(this.drawingTimer);
+            }
         }
     },
 
@@ -172,7 +181,9 @@ AFRAME.registerComponent('spotlight-controls', {
 
     setOpacity: function(opacity) {
         this.el.childNodes.forEach(function(node) {
-            node.setAttribute('opacity', 0.2 * opacity);
+            if (node.tagName === 'A-PLANE') {
+                node.setAttribute('opacity', 0.2 * opacity);
+            }
         });
     }
 });
